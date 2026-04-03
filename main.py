@@ -15,7 +15,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/remove-bg/")
+@app.post("/")
 async def remove_bg(file: UploadFile = File(...)):
     input_bytes = await file.read()
     output_bytes = remove(input_bytes)
