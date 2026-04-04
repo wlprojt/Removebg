@@ -1,7 +1,7 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
-from rembg import remove
+from rembg import remove, new_session
 
 app = FastAPI()
 
@@ -13,12 +13,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ✅ Root route (for browser + health check)
 @app.get("/")
 def root():
     return {"message": "API is running 🚀"}
 
-# ✅ Main API route
+# 🔥 Lazy load session (IMPORTANT)
+session = None
+
+def get_session():
+    global session
+    if session is None:
+        session = new_session("u2netp")  # ✅ lightweight model
+    return session
+
 @app.post("/remove-bg/")
 async def remove_bg(file: UploadFile = File(...)):
     try:
@@ -26,7 +33,9 @@ async def remove_bg(file: UploadFile = File(...)):
             return {"error": "Only image files allowed"}
 
         input_bytes = await file.read()
-        output_bytes = remove(input_bytes)
+
+        # 🔥 use lazy session
+        output_bytes = remove(input_bytes, session=get_session())
 
         return Response(content=output_bytes, media_type="image/png")
 
