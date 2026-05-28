@@ -15,26 +15,23 @@ app.add_middleware(
 
 @app.get("/")
 def root():
-    return {"message": "API is running 🚀"}
+    return {"message": "API is running"}
 
-# 🔥 Lazy load session (IMPORTANT)
 session = None
 
 def get_session():
     global session
     if session is None:
-        session = new_session("u2netp")  # ✅ lightweight model
+        session = new_session("u2netp")
     return session
 
 @app.post("/remove-bg/")
 async def remove_bg(file: UploadFile = File(...)):
     try:
-        if not file.content_type.startswith("image/"):
+        if not file.content_type or not file.content_type.startswith("image/"):
             return {"error": "Only image files allowed"}
 
         input_bytes = await file.read()
-
-        # 🔥 use lazy session
         output_bytes = remove(input_bytes, session=get_session())
 
         return Response(content=output_bytes, media_type="image/png")
