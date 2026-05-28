@@ -1,10 +1,11 @@
 import os
 
+os.environ["HOME"] = "/tmp"
 os.environ["U2NET_HOME"] = "/tmp"
 os.environ["XDG_CACHE_HOME"] = "/tmp"
+os.environ["NUMBA_CACHE_DIR"] = "/tmp"
 
-
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 from rembg import remove, new_session
@@ -28,26 +29,14 @@ def get_session():
     return session
 
 @app.get("/")
-async def root():
-    return {"message": "RemoveBG API Running 🚀"}
+def root():
+    return {"message": "API is running 🚀"}
 
 @app.post("/remove-bg/")
 async def remove_bg(file: UploadFile = File(...)):
     try:
-        if not file.content_type.startswith("image/"):
-            raise HTTPException(status_code=400, detail="Only image files allowed")
-
         input_bytes = await file.read()
-
-        output_bytes = remove(
-            input_bytes,
-            session=get_session()
-        )
-
-        return Response(
-            content=output_bytes,
-            media_type="image/png"
-        )
-
+        output_bytes = remove(input_bytes, session=get_session())
+        return Response(content=output_bytes, media_type="image/png")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        return {"error": str(e)}
