@@ -1,3 +1,9 @@
+import os
+
+os.environ["U2NET_HOME"] = "/tmp"
+os.environ["XDG_CACHE_HOME"] = "/tmp"
+
+
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
