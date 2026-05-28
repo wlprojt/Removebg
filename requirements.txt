@@ -4,4 +4,3 @@ rembg
 python-multipart
 onnxruntime
 pillow
-numpy
